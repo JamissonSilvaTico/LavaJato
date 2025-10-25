@@ -24,13 +24,13 @@ services:
           property: connectionString
       - key: CORS_ORIGIN
         fromService:
-          type: static_site
+          type: static # Correção: de 'static_site' para 'static'
           name: sglj-frontend
           property: url
       - key: NODE_ENV
         value: production
 
-  - type: static_site
+  - type: static # Correção: de 'static_site' para 'static'
     name: sglj-frontend
     region: oregon
     plan: free
