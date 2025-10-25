@@ -1,7 +1,8 @@
-// FIX: Use ES module import syntax for express to resolve module targeting and type errors.
-import express from "express";
-import cors from "cors";
-import dotenv from "dotenv";
+// Fix: Use `import = require()` for CommonJS modules like Express to fix type resolution issues.
+// The standard `import from` can cause errors with libraries like Express if `esModuleInterop` is not enabled in tsconfig.json.
+import express = require("express");
+import cors = require("cors");
+import dotenv = require("dotenv");
 import db from "./db";
 import { PoolClient } from "pg";
 
