@@ -1,4 +1,4 @@
-// FIX: Use ES module import syntax for express, cors, and dotenv.
+// FIX: Replaced CommonJS 'require' imports with ES module 'import' syntax.
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import * as dotenv from 'dotenv';
@@ -34,7 +34,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 // Rota de verificação de saúde
-// FIX: Use Request and Response types from express.
+// FIX: Updated handler signature with imported Request and Response types.
 app.get('/api/health', (req: Request, res: Response) => {
     res.status(200).send('OK');
 });
@@ -52,7 +52,7 @@ const executeQuery = async (query: string, params: any[] = []) => {
 // --- Rotas da API ---
 
 // Clientes
-// FIX: Use Request and Response types from express.
+// FIX: Updated handler signature with imported Request and Response types.
 app.get('/api/customers', async (req: Request, res: Response) => {
     try {
         const customers = await executeQuery(`
@@ -80,7 +80,7 @@ app.get('/api/customers', async (req: Request, res: Response) => {
 });
 
 
-// FIX: Use Request and Response types from express.
+// FIX: Updated handler signature with imported Request and Response types.
 app.post('/api/customers', async (req: Request, res: Response) => {
     const { name, phone, email, birthday, vehicles } = req.body;
     const client: PoolClient = await db.pool.connect();
@@ -112,7 +112,7 @@ app.post('/api/customers', async (req: Request, res: Response) => {
     }
 });
 
-// FIX: Use Request and Response types from express.
+// FIX: Updated handler signature with imported Request and Response types.
 app.put('/api/customers/:id', async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
@@ -125,7 +125,7 @@ app.put('/api/customers/:id', async (req: Request, res: Response) => {
     } catch (err) { res.status(500).json({ error: 'Erro interno do servidor' }); }
 });
 
-// FIX: Use Request and Response types from express.
+// FIX: Updated handler signature with imported Request and Response types.
 app.delete('/api/customers/:id', async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
@@ -135,13 +135,13 @@ app.delete('/api/customers/:id', async (req: Request, res: Response) => {
 });
 
 // Produtos
-// FIX: Use Request and Response types from express.
+// FIX: Updated handler signature with imported Request and Response types.
 app.get('/api/products', async (req: Request, res: Response) => {
     try { res.json(await executeQuery('SELECT * FROM products ORDER BY name')); }
     catch (err) { res.status(500).json({ error: 'Erro interno do servidor' }); }
 });
 
-// FIX: Use Request and Response types from express.
+// FIX: Updated handler signature with imported Request and Response types.
 app.post('/api/products', async (req: Request, res: Response) => {
     try {
         const { name, supplier, cost, stock, minStock } = req.body;
@@ -153,7 +153,7 @@ app.post('/api/products', async (req: Request, res: Response) => {
     } catch (err) { res.status(500).json({ error: 'Erro interno do servidor' }); }
 });
 
-// FIX: Use Request and Response types from express.
+// FIX: Updated handler signature with imported Request and Response types.
 app.put('/api/products/:id', async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
@@ -168,7 +168,7 @@ app.put('/api/products/:id', async (req: Request, res: Response) => {
     } catch (err) { res.status(500).json({ error: 'Erro interno do servidor' }); }
 });
 
-// FIX: Use Request and Response types from express.
+// FIX: Updated handler signature with imported Request and Response types.
 app.delete('/api/products/:id', async (req: Request, res: Response) => {
     try {
         await executeQuery('DELETE FROM products WHERE id = $1', [req.params.id]);
@@ -178,7 +178,7 @@ app.delete('/api/products/:id', async (req: Request, res: Response) => {
 
 
 // Serviços
-// FIX: Use Request and Response types from express.
+// FIX: Updated handler signature with imported Request and Response types.
 app.get('/api/services', async (req: Request, res: Response) => {
     try {
         const services = await executeQuery(`
@@ -193,7 +193,7 @@ app.get('/api/services', async (req: Request, res: Response) => {
     } catch (err) { res.status(500).json({ error: 'Erro interno do servidor' }); }
 });
 
-// FIX: Use Request and Response types from express.
+// FIX: Updated handler signature with imported Request and Response types.
 app.post('/api/services', async (req: Request, res: Response) => {
     try {
         const { name, price } = req.body;
@@ -202,7 +202,7 @@ app.post('/api/services', async (req: Request, res: Response) => {
     } catch (err) { res.status(500).json({ error: 'Erro interno do servidor' }); }
 });
 
-// FIX: Use Request and Response types from express.
+// FIX: Updated handler signature with imported Request and Response types.
 app.put('/api/services/:id', async (req: Request, res: Response) => {
     try {
         const { name, price } = req.body;
@@ -211,7 +211,7 @@ app.put('/api/services/:id', async (req: Request, res: Response) => {
     } catch (err) { res.status(500).json({ error: 'Erro interno do servidor' }); }
 });
 
-// FIX: Use Request and Response types from express.
+// FIX: Updated handler signature with imported Request and Response types.
 app.delete('/api/services/:id', async (req: Request, res: Response) => {
     try {
         await executeQuery('DELETE FROM services WHERE id = $1', [req.params.id]);
@@ -221,7 +221,7 @@ app.delete('/api/services/:id', async (req: Request, res: Response) => {
 
 
 // Ordens de Serviço
-// FIX: Use Request and Response types from express.
+// FIX: Updated handler signature with imported Request and Response types.
 app.get('/api/work-orders', async (req: Request, res: Response) => {
     try {
         const query = `
@@ -238,7 +238,7 @@ app.get('/api/work-orders', async (req: Request, res: Response) => {
     }
 });
 
-// FIX: Use Request and Response types from express.
+// FIX: Updated handler signature with imported Request and Response types.
 app.post('/api/work-orders', async (req: Request, res: Response) => {
     const { customerId, vehicleId, services, employee, status, checkinTime, damageLog, total, isPaid, paymentMethod } = req.body;
     const client: PoolClient = await db.pool.connect();
@@ -266,7 +266,7 @@ app.post('/api/work-orders', async (req: Request, res: Response) => {
     }
 });
 
-// FIX: Use Request and Response types from express.
+// FIX: Updated handler signature with imported Request and Response types.
 app.put('/api/work-orders/:id', async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
@@ -287,7 +287,7 @@ app.put('/api/work-orders/:id', async (req: Request, res: Response) => {
 });
 
 
-// FIX: Use Request and Response types from express.
+// FIX: Updated handler signature with imported Request and Response types.
 app.delete('/api/work-orders/:id', async (req: Request, res: Response) => {
     try {
         await executeQuery('DELETE FROM work_orders WHERE id = $1', [req.params.id]);
@@ -296,13 +296,13 @@ app.delete('/api/work-orders/:id', async (req: Request, res: Response) => {
 });
 
 // Despesas
-// FIX: Use Request and Response types from express.
+// FIX: Updated handler signature with imported Request and Response types.
 app.get('/api/expenses', async (req: Request, res: Response) => {
     try { res.json(await executeQuery('SELECT * FROM expenses ORDER BY date DESC')); }
     catch (err) { res.status(500).json({ error: 'Erro interno do servidor' }); }
 });
 
-// FIX: Use Request and Response types from express.
+// FIX: Updated handler signature with imported Request and Response types.
 app.post('/api/expenses', async (req: Request, res: Response) => {
     try {
         const { description, category, amount, date } = req.body;
@@ -314,7 +314,7 @@ app.post('/api/expenses', async (req: Request, res: Response) => {
     } catch (err) { res.status(500).json({ error: 'Erro interno do servidor' }); }
 });
 
-// FIX: Use Request and Response types from express.
+// FIX: Updated handler signature with imported Request and Response types.
 app.put('/api/expenses/:id', async (req: Request, res: Response) => {
     try {
         const { description, category, amount, date } = req.body;
@@ -326,7 +326,7 @@ app.put('/api/expenses/:id', async (req: Request, res: Response) => {
     } catch (err) { res.status(500).json({ error: 'Erro interno do servidor' }); }
 });
 
-// FIX: Use Request and Response types from express.
+// FIX: Updated handler signature with imported Request and Response types.
 app.delete('/api/expenses/:id', async (req: Request, res: Response) => {
     try {
         await executeQuery('DELETE FROM expenses WHERE id = $1', [req.params.id]);
@@ -336,7 +336,7 @@ app.delete('/api/expenses/:id', async (req: Request, res: Response) => {
 
 
 // Dados do Dashboard
-// FIX: Use Request and Response types from express.
+// FIX: Updated handler signature with imported Request and Response types.
 app.get('/api/dashboard/stats', async (req: Request, res: Response) => {
      try {
         const revenueRes = await executeQuery(`SELECT SUM(total) as total_revenue FROM work_orders WHERE is_paid = true`);
@@ -356,7 +356,7 @@ app.get('/api/dashboard/stats', async (req: Request, res: Response) => {
     }
 });
 
-// FIX: Use Request and Response types from express.
+// FIX: Updated handler signature with imported Request and Response types.
 app.get('/api/dashboard/financial-chart', async (req: Request, res: Response) => {
     try {
         // Mock data for now, replace with real query
