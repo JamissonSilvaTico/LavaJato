@@ -1,9 +1,7 @@
-// FIX: The `import = require()` syntax is for CommonJS. For ECMAScript modules,
-// standard `import` statements must be used. This also resolves downstream type
-// errors, such as the one for `express.json()`.
-import express from "express";
+// FIX: Use ES module imports to be compatible with ECMAScript modules target.
+import express, { Request, Response } from "express";
 import cors from "cors";
-import * as dotenv from "dotenv";
+import dotenv from "dotenv";
 import db from "./db";
 import { PoolClient } from "pg";
 
@@ -23,7 +21,8 @@ if (process.env.CORS_ORIGIN) {
   allowedOrigins.push(process.env.CORS_ORIGIN);
 }
 
-const corsOptions: cors.CorsOptions = {
+// FIX: Use type-level import for CorsOptions as `import cors from 'cors'` does not expose the namespace directly.
+const corsOptions: import("cors").CorsOptions = {
   origin: (origin, callback) => {
     // Permite requisições sem origem (ferramentas REST, server-to-server) ou de origens na lista.
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
@@ -41,7 +40,8 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 // Rota de verificação de saúde
-app.get("/api/health", (req, res) => {
+// FIX: Add explicit types for req and res in route handlers for type safety.
+app.get("/api/health", (req: Request, res: Response) => {
   res.status(200).send("OK");
 });
 
@@ -58,7 +58,7 @@ const executeQuery = async (query: string, params: any[] = []) => {
 // --- Rotas da API ---
 
 // Clientes
-app.get("/api/customers", async (req, res) => {
+app.get("/api/customers", async (req: Request, res: Response) => {
   try {
     const customers = await executeQuery(`
             SELECT c.*,
@@ -86,7 +86,7 @@ app.get("/api/customers", async (req, res) => {
   }
 });
 
-app.post("/api/customers", async (req, res) => {
+app.post("/api/customers", async (req: Request, res: Response) => {
   const { name, phone, email, birthday, vehicles } = req.body;
   const client: PoolClient = await db.pool.connect();
   try {
@@ -125,7 +125,7 @@ app.post("/api/customers", async (req, res) => {
   }
 });
 
-app.put("/api/customers/:id", async (req, res) => {
+app.put("/api/customers/:id", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { name, phone, email, birthday } = req.body;
@@ -139,7 +139,7 @@ app.put("/api/customers/:id", async (req, res) => {
   }
 });
 
-app.delete("/api/customers/:id", async (req, res) => {
+app.delete("/api/customers/:id", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     await executeQuery("DELETE FROM customers WHERE id = $1", [id]);
@@ -150,7 +150,7 @@ app.delete("/api/customers/:id", async (req, res) => {
 });
 
 // Produtos
-app.get("/api/products", async (req, res) => {
+app.get("/api/products", async (req: Request, res: Response) => {
   try {
     res.json(await executeQuery("SELECT * FROM products ORDER BY name"));
   } catch (err) {
@@ -158,7 +158,7 @@ app.get("/api/products", async (req, res) => {
   }
 });
 
-app.post("/api/products", async (req, res) => {
+app.post("/api/products", async (req: Request, res: Response) => {
   try {
     const { name, supplier, cost, stock, minStock } = req.body;
     const result = await executeQuery(
@@ -171,7 +171,7 @@ app.post("/api/products", async (req, res) => {
   }
 });
 
-app.put("/api/products/:id", async (req, res) => {
+app.put("/api/products/:id", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const current = (
@@ -195,7 +195,7 @@ app.put("/api/products/:id", async (req, res) => {
   }
 });
 
-app.delete("/api/products/:id", async (req, res) => {
+app.delete("/api/products/:id", async (req: Request, res: Response) => {
   try {
     await executeQuery("DELETE FROM products WHERE id = $1", [req.params.id]);
     res.status(204).send();
@@ -205,7 +205,7 @@ app.delete("/api/products/:id", async (req, res) => {
 });
 
 // Serviços
-app.get("/api/services", async (req, res) => {
+app.get("/api/services", async (req: Request, res: Response) => {
   try {
     const services = await executeQuery(`
             SELECT s.*,
@@ -221,7 +221,7 @@ app.get("/api/services", async (req, res) => {
   }
 });
 
-app.post("/api/services", async (req, res) => {
+app.post("/api/services", async (req: Request, res: Response) => {
   try {
     const { name, price } = req.body;
     const result = await executeQuery(
@@ -234,7 +234,7 @@ app.post("/api/services", async (req, res) => {
   }
 });
 
-app.put("/api/services/:id", async (req, res) => {
+app.put("/api/services/:id", async (req: Request, res: Response) => {
   try {
     const { name, price } = req.body;
     const result = await executeQuery(
@@ -247,7 +247,7 @@ app.put("/api/services/:id", async (req, res) => {
   }
 });
 
-app.delete("/api/services/:id", async (req, res) => {
+app.delete("/api/services/:id", async (req: Request, res: Response) => {
   try {
     await executeQuery("DELETE FROM services WHERE id = $1", [req.params.id]);
     res.status(204).send();
@@ -257,7 +257,7 @@ app.delete("/api/services/:id", async (req, res) => {
 });
 
 // Ordens de Serviço
-app.get("/api/work-orders", async (req, res) => {
+app.get("/api/work-orders", async (req: Request, res: Response) => {
   try {
     const query = `
             SELECT wo.*,
@@ -273,7 +273,7 @@ app.get("/api/work-orders", async (req, res) => {
   }
 });
 
-app.post("/api/work-orders", async (req, res) => {
+app.post("/api/work-orders", async (req: Request, res: Response) => {
   const {
     customerId,
     vehicleId,
@@ -321,7 +321,7 @@ app.post("/api/work-orders", async (req, res) => {
   }
 });
 
-app.put("/api/work-orders/:id", async (req, res) => {
+app.put("/api/work-orders/:id", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { status, isPaid, paymentMethod } = req.body;
@@ -345,7 +345,7 @@ app.put("/api/work-orders/:id", async (req, res) => {
   }
 });
 
-app.delete("/api/work-orders/:id", async (req, res) => {
+app.delete("/api/work-orders/:id", async (req: Request, res: Response) => {
   try {
     await executeQuery("DELETE FROM work_orders WHERE id = $1", [
       req.params.id,
@@ -357,7 +357,7 @@ app.delete("/api/work-orders/:id", async (req, res) => {
 });
 
 // Despesas
-app.get("/api/expenses", async (req, res) => {
+app.get("/api/expenses", async (req: Request, res: Response) => {
   try {
     res.json(await executeQuery("SELECT * FROM expenses ORDER BY date DESC"));
   } catch (err) {
@@ -365,7 +365,7 @@ app.get("/api/expenses", async (req, res) => {
   }
 });
 
-app.post("/api/expenses", async (req, res) => {
+app.post("/api/expenses", async (req: Request, res: Response) => {
   try {
     const { description, category, amount, date } = req.body;
     const result = await executeQuery(
@@ -378,7 +378,7 @@ app.post("/api/expenses", async (req, res) => {
   }
 });
 
-app.put("/api/expenses/:id", async (req, res) => {
+app.put("/api/expenses/:id", async (req: Request, res: Response) => {
   try {
     const { description, category, amount, date } = req.body;
     const result = await executeQuery(
@@ -391,7 +391,7 @@ app.put("/api/expenses/:id", async (req, res) => {
   }
 });
 
-app.delete("/api/expenses/:id", async (req, res) => {
+app.delete("/api/expenses/:id", async (req: Request, res: Response) => {
   try {
     await executeQuery("DELETE FROM expenses WHERE id = $1", [req.params.id]);
     res.status(204).send();
@@ -401,7 +401,7 @@ app.delete("/api/expenses/:id", async (req, res) => {
 });
 
 // Dados do Dashboard
-app.get("/api/dashboard/stats", async (req, res) => {
+app.get("/api/dashboard/stats", async (req: Request, res: Response) => {
   try {
     const revenueRes = await executeQuery(
       `SELECT SUM(total) as total_revenue FROM work_orders WHERE is_paid = true`
@@ -428,22 +428,25 @@ app.get("/api/dashboard/stats", async (req, res) => {
   }
 });
 
-app.get("/api/dashboard/financial-chart", async (req, res) => {
-  try {
-    // Mock data for now, replace with real query
-    const data = [
-      { name: "Jan", Receitas: 4000, Custos: 2400 },
-      { name: "Fev", Receitas: 3000, Custos: 1398 },
-      { name: "Mar", Receitas: 2000, Custos: 9800 },
-      { name: "Abr", Receitas: 2780, Custos: 3908 },
-      { name: "Mai", Receitas: 1890, Custos: 4800 },
-      { name: "Jun", Receitas: 2390, Custos: 3800 },
-    ];
-    res.json(data);
-  } catch (err) {
-    res.status(500).json({ error: "Erro interno do servidor" });
+app.get(
+  "/api/dashboard/financial-chart",
+  async (req: Request, res: Response) => {
+    try {
+      // Mock data for now, replace with real query
+      const data = [
+        { name: "Jan", Receitas: 4000, Custos: 2400 },
+        { name: "Fev", Receitas: 3000, Custos: 1398 },
+        { name: "Mar", Receitas: 2000, Custos: 9800 },
+        { name: "Abr", Receitas: 2780, Custos: 3908 },
+        { name: "Mai", Receitas: 1890, Custos: 4800 },
+        { name: "Jun", Receitas: 2390, Custos: 3800 },
+      ];
+      res.json(data);
+    } catch (err) {
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
   }
-});
+);
 
 app.listen(port, () => {
   console.log(`Servidor está rodando na porta ${port}`);
