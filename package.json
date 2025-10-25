@@ -10,8 +10,9 @@
     "dev:frontend": "vite",
     "dev:backend": "npm run dev --workspace=sglj-backend",
     "dev": "concurrently \"npm:dev:frontend\" \"npm:dev:backend\"",
-    "build:frontend": "tsc && vite build",
+    "build:frontend": "vite build",
     "build:backend": "npm run build --workspace=sglj-backend",
+    "start:backend": "npm run start --workspace=sglj-backend",
     "build": "npm run build:frontend && npm run build:backend",
     "preview": "vite preview"
   },

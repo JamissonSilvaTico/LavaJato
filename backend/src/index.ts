@@ -1,4 +1,4 @@
-// FIX: Use ES module imports to be compatible with ECMAScript modules target.
+// Fix: Changed import statements to ES module syntax.
 import express, { Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -11,24 +11,18 @@ const app = express();
 const port = process.env.PORT || 3001;
 
 // --- CORS Configuration ---
-// Lista de origens permitidas para segurança.
 const allowedOrigins = [
   "http://localhost:5173", // Frontend de desenvolvimento
 ];
-
-// Se uma URL de frontend de produção for fornecida nas variáveis de ambiente, adicione-a à lista.
 if (process.env.CORS_ORIGIN) {
   allowedOrigins.push(process.env.CORS_ORIGIN);
 }
 
-// FIX: Use type-level import for CorsOptions as `import cors from 'cors'` does not expose the namespace directly.
-const corsOptions: import("cors").CorsOptions = {
+const corsOptions: cors.CorsOptions = {
   origin: (origin, callback) => {
-    // Permite requisições sem origem (ferramentas REST, server-to-server) ou de origens na lista.
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      // Bloqueia requisições de origens não permitidas.
       callback(new Error("Não permitido pela política de CORS"));
     }
   },
@@ -40,7 +34,6 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 // Rota de verificação de saúde
-// FIX: Add explicit types for req and res in route handlers for type safety.
 app.get("/api/health", (req: Request, res: Response) => {
   res.status(200).send("OK");
 });
