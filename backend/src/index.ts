@@ -1,8 +1,8 @@
-// Fix: Use `import = require()` for CommonJS modules like Express to fix type resolution issues.
-// The standard `import from` can cause errors with libraries like Express if `esModuleInterop` is not enabled in tsconfig.json.
-import express = require("express");
-import cors = require("cors");
-import dotenv = require("dotenv");
+// Fix: Use standard ES module imports for Express, cors, and dotenv.
+// The previous `import = require()` syntax is for CommonJS and is incompatible with the current TypeScript configuration which targets ES modules.
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
 import db from "./db";
 import { PoolClient } from "pg";
 
@@ -17,6 +17,7 @@ const corsOptions = {
   optionsSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
+// Fix: The `express.json()` middleware was previously mis-typed due to incorrect imports, causing an overload error. Correcting the import fixes this.
 app.use(express.json());
 
 // Health check route
