@@ -1,5 +1,5 @@
 import { Pool } from 'pg';
-// FIX: Use ES module import syntax instead of 'require'.
+// Fix: Use ES module import syntax
 import * as dotenv from 'dotenv';
 
 dotenv.config();
