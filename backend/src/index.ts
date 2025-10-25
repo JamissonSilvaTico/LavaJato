@@ -1,5 +1,4 @@
-// FIX: Use ES module import syntax for express to be compatible with the project's module system.
-// This resolves a type conflict that caused errors with app.use().
+// FIX: Use ES module import syntax for express to resolve module targeting and type errors.
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";

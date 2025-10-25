@@ -8,6 +8,23 @@ databases:
     plan: free
     region: oregon
 
+staticSites:
+  - name: sglj-frontend
+    region: oregon
+    plan: free
+    buildCommand: "npm install && npm run build:frontend"
+    publishDir: dist
+    routes:
+      - type: rewrite
+        source: "/*"
+        destination: "/index.html"
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: sglj-backend
+          property: url
+
 services:
   - type: web
     name: sglj-backend
@@ -24,27 +41,8 @@ services:
           property: connectionString
       - key: CORS_ORIGIN
         fromService:
-          type: static # Correção: o tipo de referência é 'static'
+          type: static
           name: sglj-frontend
           property: url
       - key: NODE_ENV
         value: production
-
-# Sites estáticos têm sua própria seção de nível superior
-staticSites:
-  - name: sglj-frontend
-    region: oregon
-    plan: free
-    buildCommand: "npm install && npm run build:frontend"
-    publishDir: dist
-    # Regra de reescrita para corrigir o erro "Cannot GET /" em SPAs
-    routes:
-      - type: rewrite
-        source: "/*"
-        destination: "/index.html"
-    envVars:
-      - key: VITE_API_URL
-        fromService:
-          type: web
-          name: sglj-backend
-          property: url
