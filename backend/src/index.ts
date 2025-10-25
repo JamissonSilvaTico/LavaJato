@@ -1,4 +1,4 @@
-import express from "express";
+import express = require("express");
 import cors from "cors";
 import dotenv from "dotenv";
 import db from "./db";
@@ -6,9 +6,6 @@ import { PoolClient } from "pg";
 
 dotenv.config();
 
-// FIX: The `Application` type was incorrectly imported as a named export.
-// Removing the explicit type annotation lets TypeScript correctly infer the `app` type
-// from the `express()` call, resolving the method overload error for `app.use()`.
 const app = express();
 const port = process.env.PORT || 3001;
 
