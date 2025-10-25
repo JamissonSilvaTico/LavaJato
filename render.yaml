@@ -21,7 +21,7 @@ services:
     plan: free # Usa o plano gratuito
     region: frankfurt # Use a mesma região do banco de dados para baixa latência
     runtime: node
-    repo: https://github.com/seu-usuario/seu-repositorio # <-- MUDE AQUI para o seu repositório
+    repo: https://github.com/JamissonSilvaTico/LavaJato # <-- MUDE AQUI para o seu repositório
     buildCommand: "npm install && npm run build:backend"
     startCommand: "npm start --workspace=sglj-backend"
     healthCheckPath: /api/health
@@ -42,7 +42,7 @@ services:
   - name: sglj-frontend
     type: static_site # Correção: tipo de serviço para site estático
     plan: free # Usa o plano gratuito
-    repo: https://github.com/seu-usuario/seu-repositorio # <-- MUDE AQUI para o seu repositório
+    repo: https://github.com/JamissonSilvaTico/LavaJatohttps://github.com/seu-usuario/seu-repositorio # <-- MUDE AQUI para o seu repositório
     buildCommand: "npm install && npm run build:frontend"
     publishDir: dist
     envVars:
