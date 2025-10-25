@@ -15,9 +15,9 @@ const corsOptions = {
   optionsSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
-// FIX: The `express.json()` middleware was causing a TypeScript overload error.
-// Passing an empty options object `{}` helps the compiler resolve the correct signature.
-app.use(express.json({}));
+// FIX: The `express.json()` middleware was causing a TypeScript overload error with an empty options object.
+// Calling it without arguments resolves the issue.
+app.use(express.json());
 
 // Health check route
 app.get("/api/health", (req, res) => {

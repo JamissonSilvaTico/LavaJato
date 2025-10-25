@@ -1,24 +1,21 @@
 # render.yaml
 # Este arquivo define a infraestrutura para o projeto SGLJ no Render.
-# Ele cria um banco de dados PostgreSQL, um serviço web para o backend
-# e um site estático para o frontend.
+# Ele utiliza a sintaxe moderna, definindo o banco de dados, o serviço web (backend)
+# e o site estático (frontend) de forma clara.
 
-services:
+databases:
   # 1. Banco de Dados PostgreSQL
   - name: sglj-db
-    type: pserv
-    plan: free # Usa o plano gratuito
-    region: frankfurt # Especifique a região
-    postgres:
-      version: "14"
-    disk:
-      name: sglj-db-disk
-      sizeGB: 1
+    plan: free
+    region: frankfurt
+    databaseName: sglj_db # Nome do banco
+    user: sglj_user # Nome do usuário
 
+services:
   # 2. Backend (Serviço Web)
   - name: sglj-backend
     type: web
-    plan: free # Usa o plano gratuito
+    plan: free
     region: frankfurt # Use a mesma região do banco de dados para baixa latência
     runtime: node
     repo: https://github.com/JamissonSilvaTico/LavaJato # <-- MUDE AQUI para o seu repositório
@@ -34,15 +31,16 @@ services:
         value: production
       - key: CORS_ORIGIN
         fromService:
-          type: static_site # Correção: tipo de serviço para site estático
+          type: static_site
           name: sglj-frontend
           property: url
 
   # 3. Frontend (Site Estático)
   - name: sglj-frontend
-    type: static_site # Correção: tipo de serviço para site estático
-    plan: free # Usa o plano gratuito
-    repo: https://github.com/JamissonSilvaTico/LavaJatohttps://github.com/seu-usuario/seu-repositorio # <-- MUDE AQUI para o seu repositório
+    type: static_site
+    plan: free
+    region: frankfurt
+    repo: https://github.com/JamissonSilvaTico/LavaJato # <-- MUDE AQUI para o seu repositório
     buildCommand: "npm install && npm run build:frontend"
     publishDir: dist
     envVars:
