@@ -1,7 +1,9 @@
-// FIX: Switched from CommonJS 'require' to ES module 'import' syntax to resolve module targeting errors. This fixes type inference issues with Express and CORS.
+// FIX: The `import = require()` syntax is for CommonJS. For ECMAScript modules,
+// standard `import` statements must be used. This also resolves downstream type
+// errors, such as the one for `express.json()`.
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
+import * as dotenv from "dotenv";
 import db from "./db";
 import { PoolClient } from "pg";
 
