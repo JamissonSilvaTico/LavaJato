@@ -1,5 +1,5 @@
 import { Pool } from 'pg';
-// FIX: Changed import to ES module syntax.
+// FIX: Use ES module import syntax for dotenv.
 import * as dotenv from 'dotenv';
 
 dotenv.config();
