@@ -1,55 +1,49 @@
-# render.yaml
-# Este arquivo define a infraestrutura para o projeto SGLJ no Render.
-# Ele utiliza a sintaxe moderna, definindo o banco de dados, o serviço web (backend)
-# e o site estático (frontend) de forma clara.
+# Blueprint para deploy do SGLJ no Render
+# Lembre-se de substituir a URL do repositório pela sua.
 
 databases:
-  # 1. Banco de Dados PostgreSQL
   - name: sglj-db
+    databaseName: sglj_db
+    user: sglj_user
     plan: free
-    region: frankfurt
-    databaseName: sglj_db # Nome do banco
-    user: sglj_user # Nome do usuário
+    region: oregon
 
 services:
-  # 2. Backend (Serviço Web)
-  - name: sglj-backend
-    type: web
-    plan: free
-    region: frankfurt # Use a mesma região do banco de dados para baixa latência
+  - type: web
+    name: sglj-backend
     runtime: node
-    repo: https://github.com/JamissonSilvaTico/LavaJato # <-- MUDE AQUI para o seu repositório
-    buildCommand: "npm install && npm run build:backend"
-    startCommand: "npm start --workspace=sglj-backend"
-    healthCheckPath: /api/health
+    region: oregon
+    plan: free
+    rootDir: backend
+    buildCommand: "npm install && npm run build"
+    startCommand: "npm start"
     envVars:
       - key: DATABASE_URL
         fromDatabase:
           name: sglj-db
           property: connectionString
-      - key: NODE_ENV
-        value: production
       - key: CORS_ORIGIN
         fromService:
           type: static_site
           name: sglj-frontend
           property: url
+      - key: NODE_ENV
+        value: production
 
-  # 3. Frontend (Site Estático)
-  - name: sglj-frontend
-    type: static_site
+  - type: static_site
+    name: sglj-frontend
+    region: oregon
     plan: free
-    region: frankfurt
-    repo: https://github.com/JamissonSilvaTico/LavaJato # <-- MUDE AQUI para o seu repositório
     buildCommand: "npm install && npm run build:frontend"
     publishDir: dist
+    # Regra de reescrita para corrigir o erro "Cannot GET /" em SPAs
+    routes:
+      - type: rewrite
+        source: "/*"
+        destination: "/index.html"
     envVars:
       - key: VITE_API_URL
         fromService:
           type: web
           name: sglj-backend
           property: url
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html

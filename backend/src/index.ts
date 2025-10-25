@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Application } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import db from "./db";
@@ -6,7 +6,7 @@ import { PoolClient } from "pg";
 
 dotenv.config();
 
-const app = express();
+const app: Application = express();
 const port = process.env.PORT || 3001;
 
 // Middleware
@@ -15,8 +15,6 @@ const corsOptions = {
   optionsSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
-// FIX: The `express.json()` middleware was causing a TypeScript overload error with an empty options object.
-// Calling it without arguments resolves the issue.
 app.use(express.json());
 
 // Health check route
@@ -57,7 +55,6 @@ app.get("/api/customers", async (req, res) => {
 
 app.post("/api/customers", async (req, res) => {
   const { name, phone, email, birthday, vehicles } = req.body;
-  // Fix: Removed unnecessary '(db as any)' cast.
   const client: PoolClient = await db.pool.connect();
   try {
     await client.query("BEGIN");
@@ -144,7 +141,18 @@ app.post("/api/products", async (req, res) => {
 app.put("/api/products/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, supplier, cost, stock, min_stock } = req.body;
+    // In a real app, you'd get the fields to update from req.body
+    const current = (
+      await executeQuery("SELECT * FROM products WHERE id=$1", [id])
+    )[0];
+    const {
+      name = current.name,
+      supplier = current.supplier,
+      cost = current.cost,
+      stock = current.stock,
+      min_stock = current.min_stock,
+    } = req.body;
+
     const result = await executeQuery(
       "UPDATE products SET name=$1, supplier=$2, cost=$3, stock=$4, min_stock=$5 WHERE id=$6 RETURNING *",
       [name, supplier, cost, stock, min_stock, id]
@@ -221,19 +229,22 @@ app.get("/api/work-orders", async (req, res) => {
   try {
     const query = `
             SELECT wo.*,
-                   to_json(c.*) as customer,
-                   to_json(v.*) as vehicle,
-                   COALESCE(json_agg(s.*) FILTER (WHERE s.id IS NOT NULL), '[]') as services
+                   (SELECT row_to_json(c.*) FROM customers c WHERE c.id = wo.customer_id) as customer_details,
+                   (SELECT row_to_json(v.*) FROM vehicles v WHERE v.id = wo.vehicle_id) as vehicle_details,
+                   COALESCE((SELECT json_agg(s.*) FROM services s JOIN work_order_services wos ON s.id = wos.service_id WHERE wos.work_order_id = wo.id), '[]') as services
             FROM work_orders wo
-            JOIN customers c ON wo.customer_id = c.id
-            JOIN vehicles v ON wo.vehicle_id = v.id
-            LEFT JOIN work_order_services wos ON wo.id = wos.work_order_id
-            LEFT JOIN services s ON s.id = wos.service_id
-            GROUP BY wo.id, c.id, v.id
             ORDER BY wo.checkin_time DESC
         `;
-    res.json(await executeQuery(query));
+    const workOrders = await executeQuery(query);
+    // Map the results to match frontend expectations
+    const formatted = workOrders.map((wo) => ({
+      ...wo,
+      services: wo.services || [],
+      // The customer/vehicle details are already part of the main object from the previous logic
+    }));
+    res.json(formatted);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -251,7 +262,6 @@ app.post("/api/work-orders", async (req, res) => {
     isPaid,
     paymentMethod,
   } = req.body;
-  // Fix: Removed unnecessary '(db as any)' cast.
   const client: PoolClient = await db.pool.connect();
   try {
     await client.query("BEGIN");

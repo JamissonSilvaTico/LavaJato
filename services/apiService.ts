@@ -1,5 +1,3 @@
-// FIX: The /// <reference> directive for "vite/client" was removed as the type definition file could not be found.
-// To resolve the subsequent error on `import.meta.env`, `import.meta` is cast to `any`.
 import {
   Customer,
   Expense,
@@ -9,8 +7,7 @@ import {
   Vehicle,
 } from "../types";
 
-const API_BASE_URL =
-  (import.meta as any).env.VITE_API_URL || "http://localhost:3001";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
 const API_URL = `${API_BASE_URL}/api`;
 
 const handleResponse = async (response: Response) => {
