@@ -34,13 +34,13 @@ services:
         value: production
       - key: CORS_ORIGIN
         fromService:
-          type: static
+          type: static_site # Correção: tipo de serviço para site estático
           name: sglj-frontend
           property: url
 
   # 3. Frontend (Site Estático)
   - name: sglj-frontend
-    type: static
+    type: static_site # Correção: tipo de serviço para site estático
     plan: free # Usa o plano gratuito
     repo: https://github.com/seu-usuario/seu-repositorio # <-- MUDE AQUI para o seu repositório
     buildCommand: "npm install && npm run build:frontend"
