@@ -1,5 +1,5 @@
 import { Pool } from 'pg';
-// FIX: Changed to ES module compatible import to resolve build errors.
+// FIX: Changed import from CommonJS to ES Module syntax.
 import * as dotenv from 'dotenv';
 
 dotenv.config();
