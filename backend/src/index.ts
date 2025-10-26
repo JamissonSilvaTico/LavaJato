@@ -1,6 +1,4 @@
-// FIX: Changed imports from CommonJS to ES Module syntax to resolve type errors.
-// FIX: Aliased Request and Response to avoid conflicts with DOM types.
-import express, { Request as ExpressRequest, Response as ExpressResponse } from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import * as dotenv from 'dotenv';
 import db from './db';
@@ -35,8 +33,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 // Rota de verificação de saúde
-// FIX: Updated request and response types to use imported Request and Response from express.
-app.get('/api/health', (req: ExpressRequest, res: ExpressResponse) => {
+app.get('/api/health', (req: Request, res: Response) => {
     res.status(200).send('OK');
 });
 
@@ -53,8 +50,7 @@ const executeQuery = async (query: string, params: any[] = []) => {
 // --- Rotas da API ---
 
 // Clientes
-// FIX: Updated request and response types to use imported Request and Response from express.
-app.get('/api/customers', async (req: ExpressRequest, res: ExpressResponse) => {
+app.get('/api/customers', async (req: Request, res: Response) => {
     try {
         const customers = await executeQuery(`
             SELECT c.*,
@@ -81,8 +77,7 @@ app.get('/api/customers', async (req: ExpressRequest, res: ExpressResponse) => {
 });
 
 
-// FIX: Updated request and response types to use imported Request and Response from express.
-app.post('/api/customers', async (req: ExpressRequest, res: ExpressResponse) => {
+app.post('/api/customers', async (req: Request, res: Response) => {
     const { name, phone, email, birthday, vehicles } = req.body;
     const client: PoolClient = await db.pool.connect();
     try {
@@ -113,8 +108,7 @@ app.post('/api/customers', async (req: ExpressRequest, res: ExpressResponse) => 
     }
 });
 
-// FIX: Updated request and response types to use imported Request and Response from express.
-app.put('/api/customers/:id', async (req: ExpressRequest, res: ExpressResponse) => {
+app.put('/api/customers/:id', async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const { name, phone, email, birthday } = req.body;
@@ -126,8 +120,7 @@ app.put('/api/customers/:id', async (req: ExpressRequest, res: ExpressResponse) 
     } catch (err) { res.status(500).json({ error: 'Erro interno do servidor' }); }
 });
 
-// FIX: Updated request and response types to use imported Request and Response from express.
-app.delete('/api/customers/:id', async (req: ExpressRequest, res: ExpressResponse) => {
+app.delete('/api/customers/:id', async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         await executeQuery('DELETE FROM customers WHERE id = $1', [id]);
@@ -136,14 +129,12 @@ app.delete('/api/customers/:id', async (req: ExpressRequest, res: ExpressRespons
 });
 
 // Produtos
-// FIX: Updated request and response types to use imported Request and Response from express.
-app.get('/api/products', async (req: ExpressRequest, res: ExpressResponse) => {
+app.get('/api/products', async (req: Request, res: Response) => {
     try { res.json(await executeQuery('SELECT * FROM products ORDER BY name')); }
     catch (err) { res.status(500).json({ error: 'Erro interno do servidor' }); }
 });
 
-// FIX: Updated request and response types to use imported Request and Response from express.
-app.post('/api/products', async (req: ExpressRequest, res: ExpressResponse) => {
+app.post('/api/products', async (req: Request, res: Response) => {
     try {
         const { name, supplier, cost, stock, minStock } = req.body;
         const result = await executeQuery(
@@ -154,8 +145,7 @@ app.post('/api/products', async (req: ExpressRequest, res: ExpressResponse) => {
     } catch (err) { res.status(500).json({ error: 'Erro interno do servidor' }); }
 });
 
-// FIX: Updated request and response types to use imported Request and Response from express.
-app.put('/api/products/:id', async (req: ExpressRequest, res: ExpressResponse) => {
+app.put('/api/products/:id', async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const current = (await executeQuery('SELECT * FROM products WHERE id=$1', [id]))[0];
@@ -169,8 +159,7 @@ app.put('/api/products/:id', async (req: ExpressRequest, res: ExpressResponse) =
     } catch (err) { res.status(500).json({ error: 'Erro interno do servidor' }); }
 });
 
-// FIX: Updated request and response types to use imported Request and Response from express.
-app.delete('/api/products/:id', async (req: ExpressRequest, res: ExpressResponse) => {
+app.delete('/api/products/:id', async (req: Request, res: Response) => {
     try {
         await executeQuery('DELETE FROM products WHERE id = $1', [req.params.id]);
         res.status(204).send();
@@ -179,8 +168,7 @@ app.delete('/api/products/:id', async (req: ExpressRequest, res: ExpressResponse
 
 
 // Serviços
-// FIX: Updated request and response types to use imported Request and Response from express.
-app.get('/api/services', async (req: ExpressRequest, res: ExpressResponse) => {
+app.get('/api/services', async (req: Request, res: Response) => {
     try {
         const services = await executeQuery(`
             SELECT s.*,
@@ -194,8 +182,7 @@ app.get('/api/services', async (req: ExpressRequest, res: ExpressResponse) => {
     } catch (err) { res.status(500).json({ error: 'Erro interno do servidor' }); }
 });
 
-// FIX: Updated request and response types to use imported Request and Response from express.
-app.post('/api/services', async (req: ExpressRequest, res: ExpressResponse) => {
+app.post('/api/services', async (req: Request, res: Response) => {
     try {
         const { name, price } = req.body;
         const result = await executeQuery('INSERT INTO services (name, price) VALUES ($1, $2) RETURNING *', [name, price]);
@@ -203,8 +190,7 @@ app.post('/api/services', async (req: ExpressRequest, res: ExpressResponse) => {
     } catch (err) { res.status(500).json({ error: 'Erro interno do servidor' }); }
 });
 
-// FIX: Updated request and response types to use imported Request and Response from express.
-app.put('/api/services/:id', async (req: ExpressRequest, res: ExpressResponse) => {
+app.put('/api/services/:id', async (req: Request, res: Response) => {
     try {
         const { name, price } = req.body;
         const result = await executeQuery('UPDATE services SET name=$1, price=$2 WHERE id=$3 RETURNING *', [name, price, req.params.id]);
@@ -212,8 +198,7 @@ app.put('/api/services/:id', async (req: ExpressRequest, res: ExpressResponse) =
     } catch (err) { res.status(500).json({ error: 'Erro interno do servidor' }); }
 });
 
-// FIX: Updated request and response types to use imported Request and Response from express.
-app.delete('/api/services/:id', async (req: ExpressRequest, res: ExpressResponse) => {
+app.delete('/api/services/:id', async (req: Request, res: Response) => {
     try {
         await executeQuery('DELETE FROM services WHERE id = $1', [req.params.id]);
         res.status(204).send();
@@ -222,8 +207,7 @@ app.delete('/api/services/:id', async (req: ExpressRequest, res: ExpressResponse
 
 
 // Ordens de Serviço
-// FIX: Updated request and response types to use imported Request and Response from express.
-app.get('/api/work-orders', async (req: ExpressRequest, res: ExpressResponse) => {
+app.get('/api/work-orders', async (req: Request, res: Response) => {
     try {
         const query = `
             SELECT wo.*,
@@ -239,8 +223,7 @@ app.get('/api/work-orders', async (req: ExpressRequest, res: ExpressResponse) =>
     }
 });
 
-// FIX: Updated request and response types to use imported Request and Response from express.
-app.post('/api/work-orders', async (req: ExpressRequest, res: ExpressResponse) => {
+app.post('/api/work-orders', async (req: Request, res: Response) => {
     const { customerId, vehicleId, services, employee, status, checkinTime, damageLog, total, isPaid, paymentMethod } = req.body;
     const client: PoolClient = await db.pool.connect();
     try {
@@ -267,8 +250,7 @@ app.post('/api/work-orders', async (req: ExpressRequest, res: ExpressResponse) =
     }
 });
 
-// FIX: Updated request and response types to use imported Request and Response from express.
-app.put('/api/work-orders/:id', async (req: ExpressRequest, res: ExpressResponse) => {
+app.put('/api/work-orders/:id', async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const { status, isPaid, paymentMethod } = req.body;
@@ -288,8 +270,7 @@ app.put('/api/work-orders/:id', async (req: ExpressRequest, res: ExpressResponse
 });
 
 
-// FIX: Updated request and response types to use imported Request and Response from express.
-app.delete('/api/work-orders/:id', async (req: ExpressRequest, res: ExpressResponse) => {
+app.delete('/api/work-orders/:id', async (req: Request, res: Response) => {
     try {
         await executeQuery('DELETE FROM work_orders WHERE id = $1', [req.params.id]);
         res.status(204).send();
@@ -297,14 +278,12 @@ app.delete('/api/work-orders/:id', async (req: ExpressRequest, res: ExpressRespo
 });
 
 // Despesas
-// FIX: Updated request and response types to use imported Request and Response from express.
-app.get('/api/expenses', async (req: ExpressRequest, res: ExpressResponse) => {
+app.get('/api/expenses', async (req: Request, res: Response) => {
     try { res.json(await executeQuery('SELECT * FROM expenses ORDER BY date DESC')); }
     catch (err) { res.status(500).json({ error: 'Erro interno do servidor' }); }
 });
 
-// FIX: Updated request and response types to use imported Request and Response from express.
-app.post('/api/expenses', async (req: ExpressRequest, res: ExpressResponse) => {
+app.post('/api/expenses', async (req: Request, res: Response) => {
     try {
         const { description, category, amount, date } = req.body;
         const result = await executeQuery(
@@ -315,8 +294,7 @@ app.post('/api/expenses', async (req: ExpressRequest, res: ExpressResponse) => {
     } catch (err) { res.status(500).json({ error: 'Erro interno do servidor' }); }
 });
 
-// FIX: Updated request and response types to use imported Request and Response from express.
-app.put('/api/expenses/:id', async (req: ExpressRequest, res: ExpressResponse) => {
+app.put('/api/expenses/:id', async (req: Request, res: Response) => {
     try {
         const { description, category, amount, date } = req.body;
         const result = await executeQuery(
@@ -327,8 +305,7 @@ app.put('/api/expenses/:id', async (req: ExpressRequest, res: ExpressResponse) =
     } catch (err) { res.status(500).json({ error: 'Erro interno do servidor' }); }
 });
 
-// FIX: Updated request and response types to use imported Request and Response from express.
-app.delete('/api/expenses/:id', async (req: ExpressRequest, res: ExpressResponse) => {
+app.delete('/api/expenses/:id', async (req: Request, res: Response) => {
     try {
         await executeQuery('DELETE FROM expenses WHERE id = $1', [req.params.id]);
         res.status(204).send();
@@ -337,8 +314,7 @@ app.delete('/api/expenses/:id', async (req: ExpressRequest, res: ExpressResponse
 
 
 // Dados do Dashboard
-// FIX: Updated request and response types to use imported Request and Response from express.
-app.get('/api/dashboard/stats', async (req: ExpressRequest, res: ExpressResponse) => {
+app.get('/api/dashboard/stats', async (req: Request, res: Response) => {
      try {
         const revenueRes = await executeQuery(`SELECT SUM(total) as total_revenue FROM work_orders WHERE is_paid = true`);
         const expensesRes = await executeQuery(`SELECT SUM(amount) as total_expenses FROM expenses`);
@@ -357,8 +333,7 @@ app.get('/api/dashboard/stats', async (req: ExpressRequest, res: ExpressResponse
     }
 });
 
-// FIX: Updated request and response types to use imported Request and Response from express.
-app.get('/api/dashboard/financial-chart', async (req: ExpressRequest, res: ExpressResponse) => {
+app.get('/api/dashboard/financial-chart', async (req: Request, res: Response) => {
     try {
         // Mock data for now, replace with real query
         const data = [
